@@ -14,6 +14,7 @@ wss.on("connection", (socket) => {
     socket.on("message", (message: string) => {
 
         let parsedMessage = JSON.parse(message);
+        // console.log(parsedMessage);
         if (parsedMessage.type === 'join') {
 
             console.log("user join room : " + parsedMessage.payload.roomId);
@@ -25,10 +26,13 @@ wss.on("connection", (socket) => {
         } else if (parsedMessage.type === 'chat') {
 
             const currentUserRoom = allSockets.find(x => x.socket === socket)?.room;
-
             const users = allSockets.forEach((x) => {
                 if (x.room === currentUserRoom) {
-                    x.socket.send(parsedMessage.payload.message);
+                    x.socket.send(JSON.stringify({  type : "chat",
+                        payload : {
+                            message : parsedMessage.payload.message
+                        } })
+                    );
                 }
             })
 
